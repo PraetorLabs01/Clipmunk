@@ -44,8 +44,8 @@ Source: "..\release\Clipmunk\*"; DestDir: "{app}"; Flags: ignoreversion recurses
 [InstallDelete]
 ; clear out the old program files on update (settings live elsewhere and are kept)
 Type: filesandordirs; Name: "{app}\_internal"
-; Discord channels built into versions before 1.7 (people add their own in Settings now)
-Type: files; Name: "{app}\share.json"
+; (share.json is left alone: friends who installed 1.1-1.6 keep the Discord channel built into it.
+;  Builds no longer contain one, so updates never overwrite it.)
 ; leftovers from when the app was called ClipDrop
 Type: files; Name: "{app}\ClipDrop.exe"
 Type: files; Name: "{autodesktop}\ClipDrop.lnk"
