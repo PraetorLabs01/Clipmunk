@@ -558,8 +558,8 @@ class SettingsDialog(QDialog):
         row.addWidget(self.remove_btn)
         row.addStretch()
         lay.addLayout(row)
-        lay.addWidget(label("Channels added here are built into the installer when you run build.bat, "
-                            "so friends get them automatically.", "Faint", wrap=True))
+        lay.addWidget(label("Channels you add are saved on this PC only. Paste a webhook link from your "
+                            "Discord server's channel settings (Integrations > Webhooks).", "Faint", wrap=True))
         self._channels = list(settings["channels"])
         self._fill_channels()
 

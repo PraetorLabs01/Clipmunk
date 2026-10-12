@@ -4,7 +4,7 @@ Pull your gaming clips from any capture app, trim them, shrink them to fit Disco
 
 ## Download
 
-**[Download Clipmunk-Setup.exe](https://github.com/gilby95/Clipmunk/releases/latest/download/Clipmunk-Setup.exe)**, run it, done: desktop icon, Start menu entry, uninstall from Windows settings. No admin needed.
+**[Download Clipmunk-Setup.exe](https://github.com/PraetorLabs01/Clipmunk/releases/latest/download/Clipmunk-Setup.exe)**, run it, done: desktop icon, Start menu entry, uninstall from Windows settings. No admin needed.
 
 Windows may say "Windows protected your PC" because the installer isn't code-signed: click **More info → Run anyway**.
 

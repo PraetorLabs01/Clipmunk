@@ -43,6 +43,26 @@ def write(path, text):
         f.write(text)
 
 
+PRIVATE = re.compile(r"discord(?:app)?\.com/api/webhooks/\d+/|gh[opsu]_[A-Za-z0-9]{20,}|github_pat_\w{20,}", re.I)
+
+
+def private_bits(folder):
+    """Releases are public: no webhook links or tokens anywhere in the build (versions 1.1-1.6 shipped
+    the #media webhook in share.json)."""
+    found = []
+    if os.path.exists(os.path.join(folder, "share.json")):
+        found.append("share.json (Discord channels)")
+    for base, _, files in os.walk(folder):
+        for name in files:
+            p = os.path.join(base, name)
+            if os.path.splitext(name)[1].lower() in (".json", ".txt", ".ini", ".cfg", ".py", ".toml", ".yaml", ".yml") \
+                    and os.path.getsize(p) < 5_000_000:
+                with open(p, encoding="utf-8", errors="ignore") as f:
+                    if PRIVATE.search(f.read()):
+                        found.append(os.path.relpath(p, folder))
+    return found
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("notes", nargs="?", default="")
@@ -70,6 +90,9 @@ def main():
     if subprocess.run(["cmd", "/c", os.path.join(ROOT, "build.bat")], cwd=ROOT, stdin=subprocess.DEVNULL).returncode:
         write(INIT, f'__version__ = "{old}"\n')
         sys.exit("Build failed; version left at " + old)
+    leaks = private_bits(os.path.join(ROOT, "release", "Clipmunk"))
+    if leaks:
+        sys.exit("Not released - the build contains private things:\n  " + "\n  ".join(leaks))
     setup = os.path.join(ROOT, "Clipmunk-Setup.exe")
     # Copies from before the rename (ClipDrop 1.5 and older) look for this file name, so the same
     # installer is uploaded under it too. Safe to drop once nobody is on 1.5 any more.

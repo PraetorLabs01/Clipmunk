@@ -18,7 +18,9 @@ rem ffmpeg is copied next to the exe afterwards (bundling it makes PyInstaller c
   run_clipdrop.py || (pause & exit /b 1)
 robocopy bin release\Clipmunk\bin /E /NFL /NDL /NJH /NJS /NP >nul
 if errorlevel 8 (echo Copying ffmpeg failed & pause & exit /b 1)
-".venv\Scripts\python.exe" tools\export_channels.py || (pause & exit /b 1)
+rem Nothing private goes in a build: Discord channels (webhook links) stay in each person's own settings.
+if exist release\Clipmunk\share.json del release\Clipmunk\share.json
+copy /y THIRD-PARTY-NOTICES.txt release\Clipmunk\ >nul
 
 for /f "delims=" %%v in ('call ".venv\Scripts\python.exe" -c "import clipdrop; print(clipdrop.__version__)"') do set VER=%%v
 set "ISCC=%LOCALAPPDATA%\Programs\Inno Setup 6\ISCC.exe"
@@ -32,5 +34,5 @@ if not exist "%ISCC%" (
 if exist Clipmunk-windows.zip del Clipmunk-windows.zip
 powershell -NoProfile -Command "Compress-Archive -Path 'release\Clipmunk' -DestinationPath 'Clipmunk-windows.zip'"
 echo.
-echo Done. Send Clipmunk-Setup.exe to your friends.
+echo Done: Clipmunk-Setup.exe and Clipmunk-windows.zip.
 pause

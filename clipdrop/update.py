@@ -9,7 +9,7 @@ import urllib.request
 from . import __version__
 
 # owner/repo on GitHub that hosts the releases (set up by tools/release.py).
-REPO = "gilby95/Clipmunk"
+REPO = "PraetorLabs01/Clipmunk"
 ASSET = "Clipmunk-Setup.exe"
 OLD_ASSETS = ("ClipDrop-Setup.exe",)     # name before the 1.6 rename
 API = os.environ.get("CLIPDROP_UPDATE_API", "https://api.github.com")   # override for testing
