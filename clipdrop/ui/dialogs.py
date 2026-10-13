@@ -554,12 +554,27 @@ class SettingsDialog(QDialog):
         self.remove_btn = QPushButton("Remove")
         self.remove_btn.setObjectName("Danger")
         self.remove_btn.clicked.connect(self._remove_channel)
+        self.invite_btn = QPushButton(" Copy invite")
+        self.invite_btn.setIcon(theme.icon("copy"))
+        self.invite_btn.setToolTip("Copies a one-line invite for this channel. Paste it in your Discord server;\n"
+                                   "friends copy it, open Clipmunk, and the channel is added for them.")
+        self.invite_btn.clicked.connect(self._copy_invite)
+        paste = QPushButton("Paste invite")
+        paste.setToolTip("Got a Clipmunk invite from your server? Copy it, then press this.")
+        paste.clicked.connect(self._paste_invite)
         row.addWidget(add)
+        row.addWidget(paste)
+        row.addWidget(self.invite_btn)
         row.addWidget(self.remove_btn)
         row.addStretch()
         lay.addLayout(row)
+        self.invite_note = label("", "Faint", wrap=True)
+        self.invite_note.hide()
+        lay.addWidget(self.invite_note)
         lay.addWidget(label("Channels you add are saved on this PC only. Paste a webhook link from your "
-                            "Discord server's channel settings (Integrations > Webhooks).", "Faint", wrap=True))
+                            "Discord server's channel settings (Integrations > Webhooks), or a Clipmunk invite. "
+                            "Server admins: add the channel, then Copy invite and post it for your friends.",
+                            "Faint", wrap=True))
         self._channels = list(settings["channels"])
         self._fill_channels()
 
@@ -602,6 +617,36 @@ class SettingsDialog(QDialog):
     def _sync_remove(self, *_):
         it = self.channel_list.currentItem()
         self.remove_btn.setEnabled(bool(it and it.data(Qt.UserRole)))
+        if hasattr(self, "invite_btn"):
+            self.invite_btn.setEnabled(bool(it and it.data(Qt.UserRole)))
+
+    def _say(self, text, bad=False):
+        self.invite_note.setText(text)
+        self.invite_note.setStyleSheet(f"color: {theme.BAD if bad else theme.GOOD};")
+        self.invite_note.show()
+
+    def _copy_invite(self):
+        from PySide6.QtGui import QGuiApplication
+        from ..invite import invite_message
+        it = self.channel_list.currentItem()
+        ch = next((c for c in self._channels if it and c["url"] == it.data(Qt.UserRole)), None)
+        if ch:
+            QGuiApplication.clipboard().setText(invite_message(ch))
+            self._say(f"Invite for #{ch['name']} copied. Paste it in your Discord server. Anyone with it can "
+                      "post to that channel, so keep it to your own server.")
+
+    def _paste_invite(self):
+        from PySide6.QtGui import QGuiApplication
+        from ..invite import parse_invite
+        from .share_dialog import JoinChannelDialog
+        ch = parse_invite(QGuiApplication.clipboard().text())
+        if not ch:
+            self._say("No Clipmunk invite on the clipboard. Copy the invite message from Discord first.", bad=True)
+            return
+        if JoinChannelDialog(ch, self).exec():
+            self._channels = [c for c in self._channels if c["url"] != ch["url"]] + [ch]
+            self._fill_channels()
+            self._say(f"Added #{ch['name']}. Press Save to keep it.")
 
     def _add_channel(self):
         from .share_dialog import AddChannelDialog

@@ -378,5 +378,44 @@ class AddChannelDialog(QDialog):
         self.accept()
 
 
+class JoinChannelDialog(QDialog):
+    """'Add #media from an invite?' - shown when a Clipmunk invite is on the clipboard."""
+
+    def __init__(self, channel, parent=None):
+        super().__init__(parent)
+        self.channel = channel
+        self.setWindowTitle("Add a Discord channel")
+        s = Shell(self, f"Add #{channel['name']} to Clipmunk?",
+                  "Someone shared a Clipmunk invite. Once it's added, Share to Discord can post your clips "
+                  f"in #{channel['name']} (up to {channel['limit_mb']:g} MB each).", width=520)
+        hint = label("Only add invites from people you know: whoever has the invite can post to that channel.",
+                     "Faint", wrap=True)
+        s.body.addWidget(hint)
+        self.status = label("", wrap=True)
+        s.body.addWidget(self.status)
+        s.footer.addStretch()
+        no = button("Not now")
+        no.clicked.connect(self.reject)
+        self.ok = button(f"Add #{channel['name']}", "Primary", "plus", theme.ON_ACCENT)
+        self.ok.setDefault(True)
+        self.ok.clicked.connect(self._check)
+        s.footer.addWidget(no)
+        s.footer.addWidget(self.ok)
+
+    def _check(self):
+        self.status.setText("Checking with Discord…")
+        self.status.setStyleSheet(f"color: {theme.MUTED};")
+        self.ok.setEnabled(False)
+        self.repaint()
+        try:
+            share.webhook_info(self.channel["url"])
+        except share.ShareError as e:
+            self.ok.setEnabled(True)
+            self.status.setText(f"{e} Ask whoever shared the invite for a new one.")
+            self.status.setStyleSheet(f"color: {theme.BAD};")
+            return
+        self.accept()
+
+
 def confirm_remove(parent, name):
     return QMessageBox.question(parent, "Remove channel", f"Stop sharing to #{name} from this PC?") == QMessageBox.Yes

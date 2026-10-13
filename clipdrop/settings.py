@@ -120,6 +120,16 @@ class Settings:
                 seen.add(ch["url"])
         return out
 
+    def has_channel(self, url):
+        return any(c["url"] == url for c in self.channels())
+
+    def add_channel(self, channel):
+        """Saves a channel on this PC (replacing one with the same webhook) and makes it the default."""
+        ch = {"name": channel["name"], "url": channel["url"], "limit_mb": float(channel.get("limit_mb") or CHANNEL_MB)}
+        self.data["channels"] = [c for c in self.data["channels"] if c.get("url") != ch["url"]] + [ch]
+        self.data["last_channel"] = ch["name"]
+        self.save()
+
 
 def bundled_channels():
     try:

@@ -176,6 +176,13 @@ class MainWindow(QMainWindow):
         self._update_timer = QTimer(self, interval=6 * 3600 * 1000, timeout=self.updater.check)
         self._update_timer.start()
 
+        # A Clipmunk invite copied from Discord: offer to add that channel when Clipmunk opens or comes back.
+        self._seen_invites = set()
+        from PySide6.QtWidgets import QApplication
+        QApplication.instance().applicationStateChanged.connect(
+            lambda state: state == Qt.ApplicationActive and QTimer.singleShot(300, self._check_clipboard_invite))
+        QTimer.singleShot(1500, self._check_clipboard_invite)
+
     # Sidebar ------------------------------------------------------------------
 
     def _build_sidebar(self):
@@ -390,9 +397,28 @@ class MainWindow(QMainWindow):
             dlg.move(screen.center() - dlg.rect().center())
         dlg.exec()
 
+    def _check_clipboard_invite(self):
+        from PySide6.QtWidgets import QApplication
+        from ..invite import parse_invite
+        from .share_dialog import JoinChannelDialog
+        if QApplication.activeModalWidget() or not self.isVisible():
+            return
+        ch = parse_invite(QApplication.clipboard().text())
+        if not ch or ch["url"] in self._seen_invites or self.settings.has_channel(ch["url"]):
+            return
+        self._seen_invites.add(ch["url"])          # ask once per invite, even if they say Not now
+        dlg = JoinChannelDialog(ch, self)
+        dlg.adjustSize()
+        dlg.move(self.screen().availableGeometry().center() - dlg.rect().center())
+        if dlg.exec():
+            self.settings.add_channel(ch)
+            self.statusBar().showMessage(f"Added #{ch['name']}. Share to Discord will post there.", 12000)
+
     def _need_channels(self):
         QMessageBox.information(self, "Add a Discord channel",
-                                "To share straight into Discord, add a channel's webhook link first "
+                                "To share straight into Discord, add a channel first. If your server posted a "
+                                "Clipmunk invite, copy it and come back to Clipmunk. Otherwise add the channel's "
+                                "webhook link "
                                 "(Settings → Discord sharing → Add channel).")
         self.open_settings()
 
