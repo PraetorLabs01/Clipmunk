@@ -33,3 +33,9 @@ Settings: where compressed clips are saved (default `Videos\Clipmunk`), and Fast
 - `release.bat "what changed"` bumps the version, builds, and publishes a GitHub release; everyone's Clipmunk offers the update next time it opens.
 
 Code: `clipdrop/compress.py` (size targeting), `library.py` (folder watching), `finder.py` (capture-app folders), `ui/` (Qt windows).
+
+## License
+
+Clipmunk is free software under the [GNU GPL v3](LICENSE). It ships FFmpeg, Qt and PySide6, each under its own license: see [THIRD-PARTY-NOTICES.txt](THIRD-PARTY-NOTICES.txt).
+
+Made by [Praetor Labs](https://github.com/PraetorLabs01).
