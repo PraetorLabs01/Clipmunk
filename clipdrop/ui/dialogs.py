@@ -535,7 +535,15 @@ class SettingsDialog(QDialog):
         lay.addWidget(self.recursive)
 
         lay.addSpacing(12)
-        lay.addWidget(section("DISCORD SHARING"))
+        head = QHBoxLayout()
+        head.addWidget(section("DISCORD SHARING"))
+        head.addStretch()
+        guide = QPushButton("How to set up sharing")
+        guide.setObjectName("Link")
+        guide.setCursor(Qt.PointingHandCursor)
+        guide.clicked.connect(self._open_guide)
+        head.addWidget(guide)
+        lay.addLayout(head)
         row = QHBoxLayout()
         row.addWidget(label("Post clips as", "Muted"))
         self.display_name = QLineEdit(settings["display_name"])
@@ -619,6 +627,15 @@ class SettingsDialog(QDialog):
         self.remove_btn.setEnabled(bool(it and it.data(Qt.UserRole)))
         if hasattr(self, "invite_btn"):
             self.invite_btn.setEnabled(bool(it and it.data(Qt.UserRole)))
+
+    def _open_guide(self):
+        from .sharing_guide import SharingGuide
+        g = SharingGuide(self, start="admin" if self._channels else "friend")
+        g.exec()
+        if g.action == "add":
+            self._add_channel()
+        elif g.action == "paste":
+            self._paste_invite()
 
     def _say(self, text, bad=False):
         self.invite_note.setText(text)

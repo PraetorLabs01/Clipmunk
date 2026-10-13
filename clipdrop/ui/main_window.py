@@ -415,12 +415,29 @@ class MainWindow(QMainWindow):
             self.statusBar().showMessage(f"Added #{ch['name']}. Share to Discord will post there.", 12000)
 
     def _need_channels(self):
-        QMessageBox.information(self, "Add a Discord channel",
-                                "To share straight into Discord, add a channel first. If your server posted a "
-                                "Clipmunk invite, copy it and come back to Clipmunk. Otherwise add the channel's "
-                                "webhook link "
-                                "(Settings → Discord sharing → Add channel).")
-        self.open_settings()
+        """Share pressed with no channels yet: show the setup guide, then do what they picked."""
+        from PySide6.QtWidgets import QApplication
+        from ..invite import parse_invite
+        from .share_dialog import AddChannelDialog, JoinChannelDialog
+        from .sharing_guide import SharingGuide
+        g = SharingGuide(self, start="friend")
+        g.exec()
+        if g.action == "paste":
+            ch = parse_invite(QApplication.clipboard().text())
+            if not ch:
+                QMessageBox.information(self, "No invite copied",
+                                        "There's no Clipmunk invite on the clipboard. Copy the invite message "
+                                        "from Discord, then press Share to Discord again.")
+                return
+            if JoinChannelDialog(ch, self).exec():
+                self.settings.add_channel(ch)
+                self.statusBar().showMessage(f"Added #{ch['name']}. Press Share to Discord to post.", 12000)
+        elif g.action == "add":
+            dlg = AddChannelDialog(self)
+            if dlg.exec():
+                self.settings.add_channel(dlg.result_channel)
+                self.statusBar().showMessage(f"Added #{dlg.result_channel['name']}. Press Share to Discord to post.",
+                                             12000)
 
     def open_settings(self):
         if SettingsDialog(self.settings, self).exec():
