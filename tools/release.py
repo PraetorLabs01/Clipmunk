@@ -94,14 +94,9 @@ def main():
     if leaks:
         sys.exit("Not released - the build contains private things:\n  " + "\n  ".join(leaks))
     setup = os.path.join(ROOT, "Clipmunk-Setup.exe")
-    # Copies from before the rename (ClipDrop 1.5 and older) look for this file name, so the same
-    # installer is uploaded under it too. Safe to drop once nobody is on 1.5 any more.
-    legacy = os.path.join(tempfile.mkdtemp(prefix="clipmunk_rel_"), "ClipDrop-Setup.exe")
-    shutil.copyfile(setup, legacy)
     notes = a.notes or f"Clipmunk {new}"
-    run(g, "release", "create", f"v{new}", setup, legacy, "--repo", repo, "--title", f"Clipmunk {new}",
+    run(g, "release", "create", f"v{new}", setup, "--repo", repo, "--title", f"Clipmunk {new}",
         "--notes", notes)
-    shutil.rmtree(os.path.dirname(legacy), ignore_errors=True)
     print(f"\nDone. Friends will see 'Update to {new}' next time they open Clipmunk.")
     print(f"First-time download link: https://github.com/{repo}/releases/latest/download/Clipmunk-Setup.exe")
 
