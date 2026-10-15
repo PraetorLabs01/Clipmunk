@@ -1,0 +1,34 @@
+name: Bug report
+description: Something in Clipmunk doesn't work
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: What did you do, what did you expect, and what happened instead?
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Clipmunk version
+      description: Settings → About & licenses
+      placeholder: "1.10.0"
+    validations:
+      required: true
+  - type: input
+    id: gpu
+    attributes:
+      label: Graphics card
+      placeholder: "e.g. NVIDIA RTX 3060, AMD RX 6700, Intel Arc, or none"
+  - type: input
+    id: capture
+    attributes:
+      label: Capture app
+      placeholder: "e.g. OBS, NVIDIA App, Medal, Xbox Game Bar"
+  - type: textarea
+    id: more
+    attributes:
+      label: Anything else?
+      description: Screenshots help. Please don't paste webhook links or invites, since anyone could use them.

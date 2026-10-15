@@ -587,6 +587,11 @@ class SettingsDialog(QDialog):
         self._fill_channels()
 
         lay.addStretch()
+        about = QPushButton("About & licenses")
+        about.setObjectName("Link")
+        about.setCursor(Qt.PointingHandCursor)
+        about.clicked.connect(self._open_about)
+        s.footer.addWidget(about)
         s.footer.addStretch()
         cancel = button("Cancel")
         cancel.clicked.connect(self.reject)
@@ -627,6 +632,10 @@ class SettingsDialog(QDialog):
         self.remove_btn.setEnabled(bool(it and it.data(Qt.UserRole)))
         if hasattr(self, "invite_btn"):
             self.invite_btn.setEnabled(bool(it and it.data(Qt.UserRole)))
+
+    def _open_about(self):
+        from .about_dialog import AboutDialog
+        AboutDialog(self).exec()
 
     def _open_guide(self):
         from .sharing_guide import SharingGuide

@@ -21,6 +21,7 @@ if errorlevel 8 (echo Copying ffmpeg failed & pause & exit /b 1)
 rem Nothing private goes in a build: Discord channels (webhook links) stay in each person's own settings.
 if exist release\Clipmunk\share.json del release\Clipmunk\share.json
 copy /y THIRD-PARTY-NOTICES.txt release\Clipmunk\ >nul
+copy /y LICENSE release\Clipmunk\LICENSE.txt >nul
 
 for /f "delims=" %%v in ('call ".venv\Scripts\python.exe" -c "import clipdrop; print(clipdrop.__version__)"') do set VER=%%v
 set "ISCC=%LOCALAPPDATA%\Programs\Inno Setup 6\ISCC.exe"

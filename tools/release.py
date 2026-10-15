@@ -6,6 +6,7 @@ Bumps the version (1.1.0 -> 1.2.0, or pass --version 2.0.0), builds the installe
 and uploads it as a GitHub release. Clipmunk on friends' PCs checks on startup.
 """
 import argparse
+import hashlib
 import json
 import os
 import re
@@ -76,6 +77,11 @@ def main():
     if not repo:
         sys.exit('No release repo set yet. Run once with --repo yourname/Clipmunk')
     run(g, "repo", "view", repo, "--json", "name", capture=True)
+    # The release is tagged on the commit that's pushed, so everything in the build must be committed first.
+    dirty = subprocess.run(["git", "status", "--porcelain", "--untracked-files=no"], cwd=ROOT,
+                           capture_output=True, text=True).stdout.strip()
+    if dirty:
+        sys.exit("Commit your changes first - the release is tagged on the pushed commit:\n" + dirty)
 
     old = re.search(r'__version__ = "(.+)"', read(INIT)).group(1)
     if a.version:
@@ -93,9 +99,21 @@ def main():
     leaks = private_bits(os.path.join(ROOT, "release", "Clipmunk"))
     if leaks:
         sys.exit("Not released - the build contains private things:\n  " + "\n  ".join(leaks))
+    missing = [f for f in ("LICENSE.txt", "THIRD-PARTY-NOTICES.txt")
+               if not os.path.exists(os.path.join(ROOT, "release", "Clipmunk", f))]
+    if missing:
+        sys.exit("Not released - the build is missing " + ", ".join(missing))
     setup = os.path.join(ROOT, "Clipmunk-Setup.exe")
-    notes = a.notes or f"Clipmunk {new}"
-    run(g, "release", "create", f"v{new}", setup, "--repo", repo, "--title", f"Clipmunk {new}",
+    with open(setup, "rb") as f:
+        sha256 = hashlib.sha256(f.read()).hexdigest()
+
+    # Commit and push the version bump first, then tag exactly that commit.
+    run("git", "add", INIT, UPDATE)
+    run("git", "commit", "-q", "-m", f"Release {new}\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>")
+    run("git", "push", "-q", "origin", "HEAD:main")
+    sha = run("git", "rev-parse", "HEAD", capture=True)
+    notes = (a.notes or f"Clipmunk {new}") + f"\n\nSHA-256 of Clipmunk-Setup.exe: `{sha256}`"
+    run(g, "release", "create", f"v{new}", setup, "--repo", repo, "--target", sha, "--title", f"Clipmunk {new}",
         "--notes", notes)
     print(f"\nDone. Friends will see 'Update to {new}' next time they open Clipmunk.")
     print(f"First-time download link: https://github.com/{repo}/releases/latest/download/Clipmunk-Setup.exe")

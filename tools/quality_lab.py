@@ -1,6 +1,6 @@
 """Quality lab: encodes one stretch of a recording several ways at the same size and scores each with VMAF.
 
-    python tools/quality_lab.py "F:\\videos\\Game\\rec.mkv" START_SECONDS [--mb 20] [--dur 25] [--name label]
+    python tools/quality_lab.py "D:\\Videos\\Game\\recording.mkv" START_SECONDS [--mb 20] [--dur 25] [--name label]
 
 Writes quality-lab/<name>/ with every variant, a reference copy and results.md.
 """

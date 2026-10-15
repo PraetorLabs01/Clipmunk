@@ -12,7 +12,9 @@ from . import __version__
 REPO = "PraetorLabs01/Clipmunk"
 ASSET = "Clipmunk-Setup.exe"
 OLD_ASSETS = ("ClipDrop-Setup.exe",)     # name before the 1.6 rename
-API = os.environ.get("CLIPDROP_UPDATE_API", "https://api.github.com")   # override for testing
+# The test override only works when running from source, never in an installed copy.
+API = ("https://api.github.com" if getattr(sys, "frozen", False)
+       else os.environ.get("CLIPDROP_UPDATE_API", "https://api.github.com"))
 
 
 def _ver(tag):

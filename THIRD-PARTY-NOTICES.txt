@@ -1,20 +1,41 @@
 Clipmunk includes these programs and libraries. Each keeps its own license.
+Clipmunk's own code is licensed under the GNU General Public License v3 (see LICENSE).
 
 FFmpeg (bin\ffmpeg.exe, bin\ffprobe.exe and the DLLs in bin\)
-  License: GNU General Public License v3 (the "gpl-shared" Windows build from BtbN/FFmpeg-Builds)
-  Full text: https://www.gnu.org/licenses/gpl-3.0.txt
-  Source code: https://ffmpeg.org/download.html  -  build scripts: https://github.com/BtbN/FFmpeg-Builds
+  Version: N-127054-g9d3f0f2c58-20261001 (FFmpeg git commit 9d3f0f2c58), the "win64-gpl-shared"
+           build from BtbN/FFmpeg-Builds
+  License: GNU General Public License v3. The build also links x264, x265 and other libraries
+           under GPL-compatible licenses.
+  Full text: see LICENSE (GPL v3), or https://www.gnu.org/licenses/gpl-3.0.txt
+  Source code for this exact version: https://github.com/FFmpeg/FFmpeg/tree/9d3f0f2c58
+  Build scripts (which list every library in the build and its version): https://github.com/BtbN/FFmpeg-Builds
+  Written offer: for at least three years from the date you received Clipmunk, anyone can ask
+  praetorlabs@gmail.com for a copy of the complete corresponding source code of the FFmpeg build
+  included with Clipmunk, provided at no charge beyond the cost of shipping it.
   Clipmunk runs FFmpeg as a separate program; it is not part of Clipmunk's own code.
 
-Qt 6 and PySide6 (Qt for Python) (the Qt and PySide6 files in _internal\)
+Qt 6 and PySide6 (Qt for Python) 6.11.2 (the Qt and PySide6 files in _internal\)
   License: GNU Lesser General Public License v3
   Full text: https://www.gnu.org/licenses/lgpl-3.0.txt
   Source code: https://download.qt.io/official_releases/QtForPython/  and  https://www.qt.io/download-open-source
   The Qt libraries are separate DLL files and can be replaced with your own build.
 
-Python 3.11
+Python 3.12
   License: Python Software Foundation License
-  Full text: https://docs.python.org/3.11/license.html
+  Full text: https://docs.python.org/3.12/license.html
+  Python's standard library in _internal\ also includes bzip2, liblzma (xz), Expat, zlib and other
+  small libraries; their licenses are listed on that page.
+
+OpenSSL 3 (libssl-3-x64.dll, libcrypto-3-x64.dll), used for secure connections to GitHub and Discord
+  License: Apache License 2.0
+  Full text: https://www.openssl.org/source/license.html
+
+libffi (libffi-8.dll)
+  License: MIT
+  Full text: https://github.com/libffi/libffi/blob/master/LICENSE
+
+Microsoft Visual C++ Runtime (VCRUNTIME140.dll, VCRUNTIME140_1.dll)
+  Redistributed under the Microsoft Visual Studio redistributable license.
 
 PyInstaller (the small launcher in Clipmunk.exe)
   License: GNU General Public License v2 with an exception that allows it in distributed programs
