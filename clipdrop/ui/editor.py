@@ -739,10 +739,18 @@ class EditorPane(QWidget):
         self.player.setPosition(int(ms))
 
     def _end_preview(self):
-        if self._resume_ms is not None:
-            back, self._resume_ms = self._resume_ms, None
-            self.player.setPosition(back)
-            self.timeline.set_position(back)
+        """A trim edge was let go: go back to where you were, unless the new start moved past that spot,
+        in which case jump to the new start."""
+        previewed = self._resume_ms is not None
+        back = self._resume_ms if previewed else self.player.position()
+        self._resume_ms = None
+        if back < self.a:            # the new start is past the playhead: move it to the start
+            back = self.a
+            self._play_in_sel = True
+        elif not previewed:          # playing and still inside the clip: leave it alone
+            return
+        self.player.setPosition(back)
+        self.timeline.set_position(back)
 
     def toggle_play(self):
         if not self.clip:
